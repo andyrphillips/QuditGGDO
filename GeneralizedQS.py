@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import QuditHistogram as quditplt
 import numpy as np
 import cmath
-from QuditGateFunctions import *
+from GenQuditGateFunctions import *
 from QuditCircuits import *
 from GeneralizedQuditGates import *
 
@@ -73,15 +73,17 @@ else:
     track = False
     print("Didn't catch that, disabling tracking...")
 
+#Set Generalized F gate so it doesn't change
+GenF=GenF(indim, innum)
 
 #Print omega values of input vector associated with index and number of each possible entry
-diagonal = np.diagonal(fgate)
+diagonal = np.diagonal(GenF.unitary)
 stateset = ''
 zero = 0
 one = 0
 two = 0
 labels = []
-for k in range(27):
+for k in range(indim**innum):
         exponent = round(cmath.log(diagonal[k], w).real)
         if exponent < 0:
             exponent = 3 + exponent
@@ -110,7 +112,7 @@ for iteration in range(1,iterations):
     #Construct circuit
     circuit.append(generalized_grover_init_circuit(qudit_array, indim, innum))
     for i in range(iteration):
-	    circuit.append(GenF(indim, innum).on(*qudit_array))
+	    circuit.append(GenF.on(*qudit_array))
 	    circuit.append(generalized_grover_dif_circuit(qudit_array, indim, innum))
     circuit.append(gen_measure(qudit_array))
     #Simulate
@@ -119,7 +121,7 @@ for iteration in range(1,iterations):
 
     #Save histogram to external file
     title='histogram' + str(iteration) + '.png'
-    hplt=quditplt.plot_qudit_state_histogram(result, plt.subplot())
+    hplt=quditplt.plot_qudit_state_histogram(result, indim, plt.subplot())
     rects = hplt.patches
     for rect, label in zip(rects, labels):
         height = rect.get_height()

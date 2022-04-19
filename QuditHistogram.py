@@ -1,7 +1,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tool to visualize the results of a study. Changed states 2 to 3 and int second argument to 3"""
+#Tool to visualize the results of a study. 
+##Added second argument to get_state_histogram, d
+##Changed states 2 to d and int second argument to d
 
 from typing import Union, Optional, Sequence, SupportsFloat
 import collections
@@ -10,7 +12,7 @@ import matplotlib.pyplot as plt
 import cirq.study.result as result
 
 
-def get_state_histogram(result: 'result.Result') -> np.ndarray:
+def get_state_histogram(result: 'result.Result', d) -> np.ndarray:
     """Computes a state histogram from a single result with repetitions.
 
     Args:
@@ -21,7 +23,7 @@ def get_state_histogram(result: 'result.Result') -> np.ndarray:
         The state histogram (a numpy array) corresponding to the trial result.
     """
     num_qubits = sum([value.shape[1] for value in result.measurements.values()])
-    states = 3 ** num_qubits
+    states = d ** num_qubits
     values = np.zeros(states)
     # measurements is a dict of {measurement gate key:
     #                            array(repetitions, boolean result)}
@@ -33,13 +35,14 @@ def get_state_histogram(result: 'result.Result') -> np.ndarray:
     for meas in measurement_by_result:
         # Convert each array of booleans to a string representation.
         # e.g. [True, False] -> [1, 0] -> '10' -> 2
-        state_ind = int(''.join([str(x) for x in [int(x) for x in meas]]), 3)
+        state_ind = int(''.join([str(x) for x in [int(x) for x in meas]]), d)
         values[state_ind] += 1
     return values
 
 
 def plot_qudit_state_histogram(
     data: Union['result.Result', collections.Counter, Sequence[SupportsFloat]],
+    d,
     ax: Optional['plt.Axis'] = None,
     *,
     tick_label: Optional[Sequence[str]] = None,
@@ -77,7 +80,7 @@ def plot_qudit_state_histogram(
     if not ax:
         fig, ax = plt.subplots(1, 1)
     if isinstance(data, result.Result):
-        values = get_state_histogram(data)
+        values = get_state_histogram(data, d)
     elif isinstance(data, collections.Counter):
         tick_label, values = zip(*sorted(data.items()))
     else:

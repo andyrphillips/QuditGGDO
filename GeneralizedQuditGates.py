@@ -21,6 +21,21 @@ class GenQuditX(cirq.SingleQubitGate):
 	
 	def _circuit_diagram_info_(self, args):
 		return '[X]'
+
+class QuditXinv(cirq.SingleQubitGate):
+	def __init__(self, d, n):
+		self.d = d
+		self.I_d=np.eye(d)
+		self.X_d=np.linalg.inv(np.roll(self.I_d,1,0))
+		
+	def _qid_shape_(self):
+		return(self.d,)
+	
+	def _unitary_(self):
+		return self.X_d
+	
+	def _circuit_diagram_info_(self, args):
+		return '[X]'
 		
 #QFT Gate
 class GenQuditQFT(cirq.SingleQubitGate):
@@ -37,6 +52,21 @@ class GenQuditQFT(cirq.SingleQubitGate):
 		
 	def _circuit_diagram_info_(self, args):
 		return '[QFT]'
+		
+class QuditQFTinv(cirq.SingleQubitGate):
+	def __init__(self, d, n):
+		self.d = d
+		self.n = n
+		self.unitary = np.linalg.inv(QFT(d, n))
+        
+	def _qid_shape_(self):
+		return(self.d,)
+	
+	def _unitary_(self):
+		return self.unitary
+		
+	def _circuit_diagram_info_(self, args):
+		return '[QFT^-1]'
 		
 class GenQuditCShift(cirq.Gate):
 	def __init__(self, d, n, index):
